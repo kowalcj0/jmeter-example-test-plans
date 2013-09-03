@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.4" jmeter="2.9 r1437961">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="select N Random Lines From File" enabled="true">
+      <stringProp name="TestPlan.comments">/**
+* Author: Janusz Kowalczyk
+* Created: 2013-09-03
+* Updated: 2013-09-03
+* Description:
+* This test plan contains a Java script that selects N random lines from an input file and saves them to an output file.
+*
+**/</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1378213221000</longProp>
+        <longProp name="ThreadGroup.end_time">1378213221000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Once Only Controller" enabled="true"/>
+        <hashTree>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler" enabled="true">
+            <stringProp name="cacheKey"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">import org.apache.jmeter.services.FileServer;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import org.apache.log.Logger;
+import java.io.FileReader;
+
+/**
+ *
+ * Author: Janusz Kowalczyk
+ * Created: 2013-09-03
+ * Updated: 2013-09-03
+ * Description:
+ * This script will select N random lines from an input file and save them to an output file.
+ *
+ **/
+public class RandomLinesFromFile {
+    public static final String[] NO_STRINGS = {};
+    final Random random = new Random();
+    private String[] words;
+    private String inputFilename;
+    private File outputFile;
+    private  static final byte[] NEWLINE = System.lineSeparator().getBytes();
+    int noOfLines;
+    int maxLineLength;
+    Logger log;
+    private FileChannel rwChannel;
+    private ByteBuffer wrBuf;
+
+
+    /**
+     * Default constructor
+     * @param log               org.apache.log.Logger provided by JMeter JSR223 sampler
+     * @param inputFilename     String Absolute path to the input file
+     * @param outputFilename    String Absolute path to the output file
+     * @param noOfLines         int number of lines you want to have in output file
+     * @param maxLineLength     int length of the longest line in the input file. It is used to allocate the buffer size.
+     *                          If unknown then use an estimated value.
+     * @throws IOException
+     */
+    public RandomLinesFromFile(Logger log, String inputFilename, String outputFilename, int noOfLines, int maxLineLength) throws IOException {
+        this.log = log;
+        this.inputFilename = inputFilename;
+        this.outputFile = new File(outputFilename);
+        this.noOfLines = noOfLines;
+        this.maxLineLength = maxLineLength * 8;
+    }
+
+    /**
+     * Will set maxLineLength to 100 characters.
+     * @param log               org.apache.log.Logger provided by JMeter JSR223 sampler
+     * @param inputFilename     String Absolute path to the input file
+     * @param outputFilename    String Absolute path to the output file
+     * @param noOfLines         int number of lines you want to have in output file
+     *
+     * @throws IOException
+     */
+    public RandomLinesFromFile(Logger log, String inputFilename, String outputFilename, int noOfLines) throws IOException {
+        this(log, inputFilename, outputFilename, noOfLines, 100);
+    }
+
+    public void process() throws IOException {
+
+        if(false == new File(this.inputFilename).exists()){
+            log.error(&quot;Input file: &quot; +this.inputFilename + &quot; doesn&apos;t exists!&quot;);
+            throw new IOException(&quot;Input file &apos;&quot;+this.inputFilename +&quot;&apos; doesn&apos;t exists!!!&quot;);
+        }
+
+        if(this.outputFile.exists()){
+            outputFile.delete();
+            log.info(&quot;Output file: &quot; + outputFile.getName() + &quot; was deleted!&quot;);
+        }
+
+        this.rwChannel = new RandomAccessFile(this.outputFile.getAbsolutePath(), &quot;rw&quot;).getChannel();
+        this.wrBuf = ByteBuffer.allocate(noOfLines * maxLineLength);
+
+        this.countLines();
+
+        long start = System.nanoTime();
+        this.words = RandomLinesFromFile.load(inputFilename);
+        long end = System.nanoTime() - start;
+        this.log.info(&quot;It took &quot; + Double.toString(end / 1e9) +&quot; seconds to load the input data file.&quot;);
+
+        this.fillBuffer();
+
+        this.rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, wrBuf.position());
+
+        this.wrBuf.flip();
+
+        this.saveOutput();
+    }
+
+    /**
+     * Will load all line from the input file.
+     * Due to a fact that JSR223 sampler doesn&apos;t support Generics, I&apos;ve replaced them with an Arraylist
+     *
+     * @param filename  String absolute path to the input file
+     * @return An array of string containing all the lines from the input file
+     * @throws IOException
+     */
+    public static String[] load(String filename) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        ArrayList lines = new ArrayList();
+        // JSR223 sampler doesn&apos;t support Generics, so I&apos;ve replaced it with Arraylist
+        // Set&lt;String&gt; lines = new LinkedHashSet&lt;String&gt;();
+        try {
+            for (String line; (line = br.readLine()) != null; ) {
+                // uncomment next line if you want to skip lines with a certain character
+                //if (line.indexOf(&apos;\&apos;&apos;) &gt;= 0) continue;
+                lines.add(line.toLowerCase());
+            }
+        } finally {
+            br.close();
+        }
+        return  (String[]) lines.toArray(NO_STRINGS);
+    }
+
+    /**
+     * Gets next random line from the list of all loaded lines.
+     * @return  String random line from the list of all loaded lines.
+     */
+    public String nextWord() {
+        return this.words[random.nextInt(words.length)];
+    }
+
+    /**
+     * Helper that counts all the lines in the input file
+     * @return int Number of lines in the input file
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    public int countLines() throws IOException, FileNotFoundException {
+        BufferedReader reader = null;
+        int lines = 0;
+        long start = System.nanoTime();
+        try {
+            reader = new BufferedReader(new FileReader(this.inputFilename));
+            while (reader.readLine() != null) {
+                lines++;
+            }
+        } finally {
+            reader.close();
+        }
+        long time = System.nanoTime() - start;
+        log.info(&quot;It took &quot;+ Double.toString(time / 1e9) +&quot; seconds to count &quot; + lines.toString() + &quot; lines in the input data file.&quot;);
+        return lines;
+    }
+
+    /**
+     * Fills up the ByteBuffer with a given number of randomly selected lines
+     */
+    public void fillBuffer(){
+        long start = System.nanoTime();
+        for (int i = 0; i &lt; this.noOfLines; i++) {
+            if (this.wrBuf.hasRemaining()){
+                this.wrBuf.put(this.nextWord().getBytes());
+                this.wrBuf.put(this.NEWLINE);
+            }
+        }
+        long time = System.nanoTime() - start;
+        log.info(&quot;It took &quot;+ Double.toString(time / 1e9) +&quot; seconds to fill up the buffer with &quot;+ this.noOfLines.toString() +&quot; lines.&quot;);
+    }
+
+    /**
+     * Saves the results to an output file
+     * @throws IOException
+     */
+    public void saveOutput() throws IOException {
+        long start = System.nanoTime();
+        try {
+            this.rwChannel.write(this.wrBuf);
+        } finally {
+
+            if (this.rwChannel != null)
+                this.rwChannel.close();
+
+            this.wrBuf.rewind();
+        }
+        long time = System.nanoTime() - start;
+        log.info(&quot;It took &quot;+ Double.toString(time / 1e9) +&quot;seconds to save the output file.&quot;);
+    }
+
+}
+
+
+
+/*
+* We&apos;re using FileServer.getFileServer().getBaseDir() to get an absolute path to the directory that holds the project file (*.jmx)
+* and then access file in the &quot;data&quot; subfolder.
+*/
+String sep = System.getProperty(&quot;file.separator&quot;);
+String bDir = FileServer.getFileServer().getBaseDir();
+String input_file = bDir +sep+&quot;data&quot;+sep+&quot;8letter.txt&quot;;
+String output_file = bDir +sep+&quot;data&quot;+sep+&quot;random.txt&quot;;
+
+RandomLinesFromFile r = new RandomLinesFromFile(
+        log,
+        input_file,
+        output_file,
+        100,
+        56
+);
+r.process();</stringProp>
+            <stringProp name="scriptLanguage">java</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
