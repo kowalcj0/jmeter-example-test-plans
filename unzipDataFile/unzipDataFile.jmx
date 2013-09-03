@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.4" jmeter="2.9 r1437961">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="unzip data file" enabled="true">
+      <stringProp name="TestPlan.comments">/**
+* Author: Janusz Kowalczyk
+* Created: 2013-09-03
+* Updated: 2013-09-03
+* Description:
+* This test plan contains a Java script that unzips data file before starting the main thread group (so it doesn&apos;t appear on the graphs)
+*
+**/</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp Thread Group" enabled="true">
+        <stringProp name="TestPlan.comments">/**
+*
+* Will unpack zipped data file before starting the test
+*
+**/</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1375713577000</longProp>
+        <longProp name="ThreadGroup.end_time">1375713577000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Unzip compressed CSV data file" enabled="true">
+          <stringProp name="TestPlan.comments">/**
+*
+* &quot;JSR223 PreProcessor&quot; extracts zipped data file to any given directory
+* 
+* Stub action, that&apos;s is only here to make the &quot;JSR223 PreProcessor&quot; work and do not appear in the result files
+*
+**/</stringProp>
+        </OnceOnlyController>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="extract zipped data file" enabled="true">
+            <stringProp name="scriptLanguage">beanshell</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey"></stringProp>
+            <stringProp name="script">import org.apache.jmeter.services.FileServer;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+ 
+public class UnZip {
+
+    public static void unZipIt(filePath, outputFolder) {
+        String filePath = filePath;
+        FileInputStream fileInputStream = null;
+        ZipInputStream zipInputStream = null;
+        ZipEntry entry = null;
+        try {
+            fileInputStream = new FileInputStream(filePath);
+            zipInputStream  = new ZipInputStream(fileInputStream);
+
+            //Check for more files available or not
+            while((entry = zipInputStream.getNextEntry())!=null) {
+                if(entry.isDirectory()) {//Check if this is Directory : yes then create Directory
+                    log.info(&quot;Creating Directory:&quot;+entry.getName());
+                    File file = new File(entry.getName());
+                    if(!file.exists()) {
+                      file.mkdir();
+                    }
+                } else {
+                    log.info(&quot;omtlab &gt;&gt;Unzipping File:&quot;+entry.getName() + &quot; to: &quot; + outputFolder);
+                    int size = 0;
+                    byte[] buffer = new byte[2048];
+                    FileOutputStream fileOutputStream = new FileOutputStream(outputFolder + entry.getName());
+                    BufferedOutputStream bos = new BufferedOutputStream(fileOutputStream, buffer.length);
+                    while(  (size = zipInputStream.read(buffer, 0, buffer.length)) != -1) {
+                        bos.write(buffer,0,size);
+                    }
+                    bos.flush();
+                    bos.close();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+String INPUT_ZIP_FILE = FileServer.getFileServer().getBaseDir() + &quot;/data/8letter.txt.zip&quot;;
+String OUTPUT_FOLDER = FileServer.getFileServer().getBaseDir() + &quot;/data/&quot;;
+ 
+log.info(&quot;Started unzipping data file!!!!!&quot;);
+
+UnZip unZip = new UnZip();
+unZip.unZipIt(INPUT_ZIP_FILE, OUTPUT_FOLDER);
+
+log.info(&quot;Finished unzipping data file!!!!!&quot;);</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <TestAction guiclass="TestActionGui" testclass="TestAction" testname="Stub Action" enabled="true">
+            <stringProp name="TestPlan.comments">/**
+*
+* Stub action, that&apos;s is only here to make the JSR223 PreProcessor work and do not appear in the result files
+*
+**/</stringProp>
+            <intProp name="ActionProcessor.action">1</intProp>
+            <intProp name="ActionProcessor.target">0</intProp>
+            <stringProp name="ActionProcessor.duration">1</stringProp>
+          </TestAction>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">10</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">10</stringProp>
+        <longProp name="ThreadGroup.start_time">1378213221000</longProp>
+        <longProp name="ThreadGroup.end_time">1378213221000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Load words from an unzipped data file" enabled="true">
+          <stringProp name="delimiter">,</stringProp>
+          <stringProp name="fileEncoding">us-ascii</stringProp>
+          <stringProp name="filename">data/8letter.txt</stringProp>
+          <boolProp name="quotedData">false</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <stringProp name="shareMode">All threads</stringProp>
+          <boolProp name="stopThread">false</boolProp>
+          <stringProp name="variableNames">WORD,</stringProp>
+          <stringProp name="TestPlan.comments">/**
+*
+* Reads in list of BIP profile URLs and assign them in a round-robin manner to a variable &quot;CONTEXT&quot;
+*
+**/</stringProp>
+        </CSVDataSet>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET google.com/?q=${WORD}" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">google.com</stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">?q=${WORD}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

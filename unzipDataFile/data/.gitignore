@@ -1,0 +1,5 @@
+# ignore all unzipped txt files
+*.txt
+
+# do not ignore zipped data files
+!*.zip
