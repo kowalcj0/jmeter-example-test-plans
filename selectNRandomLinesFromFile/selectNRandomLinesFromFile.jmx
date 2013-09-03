@@ -240,7 +240,7 @@ RandomLinesFromFile r = new RandomLinesFromFile(
         input_file,
         output_file,
         100,
-        56
+        7
 );
 r.process();</stringProp>
             <stringProp name="scriptLanguage">java</stringProp>
