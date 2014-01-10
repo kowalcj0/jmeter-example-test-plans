@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="2.4" jmeter="2.9 r1437961">
+<jmeterTestPlan version="1.2" properties="2.5" jmeter="2.10 r1533061">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="select N Random Lines From File" enabled="true">
       <stringProp name="TestPlan.comments">/**
@@ -62,7 +62,11 @@ public class RandomLinesFromFile {
     private String[] words;
     private String inputFilename;
     private File outputFile;
-    private  static final byte[] NEWLINE = System.lineSeparator().getBytes();
+    // java 6 compatible
+    // System.getProperty(&quot;line.separator&quot;).getBytes();
+    // java 7
+    // System.lineSeparator().getBytes();
+    private  static final byte[] NEWLINE = System.getProperty(&quot;line.separator&quot;).getBytes();
     int noOfLines;
     int maxLineLength;
     Logger log;
