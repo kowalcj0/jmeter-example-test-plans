@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.5" jmeter="2.10 r1533061">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="test-plan-template-with-datafile-randomizer" enabled="true">
+      <stringProp name="TestPlan.comments">/**
+* 
+* A test plan template, that will select N random lines from a datafile and save them in a ./data/random.txt
+*
+**/</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Load main project specific config" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="hostname" elementType="Argument">
+            <stringProp name="Argument.name">hostname</stringProp>
+            <stringProp name="Argument.value">${__P(hostname,localhost)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="port" elementType="Argument">
+            <stringProp name="Argument.name">port</stringProp>
+            <stringProp name="Argument.value">${__P(port,8000)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RPS" elementType="Argument">
+            <stringProp name="Argument.name">RPS</stringProp>
+            <stringProp name="Argument.value">${__P(RPS,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Overall number of Requests per seconds (generated using all available load generators)</stringProp>
+          </elementProp>
+          <elementProp name="noOfLG" elementType="Argument">
+            <stringProp name="Argument.name">noOfLG</stringProp>
+            <stringProp name="Argument.value">${__P(noOfLG,1)}</stringProp>
+            <stringProp name="Argument.desc">number of load generators</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="duration" elementType="Argument">
+            <stringProp name="Argument.name">duration</stringProp>
+            <stringProp name="Argument.value">${__P(duration,15)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="shutdown_time" elementType="Argument">
+            <stringProp name="Argument.name">shutdown_time</stringProp>
+            <stringProp name="Argument.value">${__P(shutdown_time,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="startup_delay" elementType="Argument">
+            <stringProp name="Argument.name">startup_delay</stringProp>
+            <stringProp name="Argument.value">${__P(startup_delay,0)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="protocol" elementType="Argument">
+            <stringProp name="Argument.name">protocol</stringProp>
+            <stringProp name="Argument.value">${__P(protocol,http)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="datafilepath" elementType="Argument">
+            <stringProp name="Argument.name">datafilepath</stringProp>
+            <stringProp name="Argument.value">${__P(datafilepath,data/8letter.txt)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="numberOfRandomLinesToSelect" elementType="Argument">
+            <stringProp name="Argument.name">numberOfRandomLinesToSelect</stringProp>
+            <stringProp name="Argument.value">${__P(numberOfRandomLinesToSelect,100)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">number of lines you want to have in output file</stringProp>
+          </elementProp>
+          <elementProp name="maxLineLength" elementType="Argument">
+            <stringProp name="Argument.name">maxLineLength</stringProp>
+            <stringProp name="Argument.value">${__P(maxLineLength,8)}</stringProp>
+            <stringProp name="Argument.desc">Length of the longest line in the input file. It is used to allocate the buffer size. If unknown then use an estimated value.</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="connect_timeout" elementType="Argument">
+            <stringProp name="Argument.name">connect_timeout</stringProp>
+            <stringProp name="Argument.value">${__P(connect_timeout,10000)}</stringProp>
+            <stringProp name="Argument.desc">Connection Timeout. Number of milliseconds to wait for a connection to open.</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="response_timeout" elementType="Argument">
+            <stringProp name="Argument.name">response_timeout</stringProp>
+            <stringProp name="Argument.value">${__P(response_timeout,10000)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Response Timeout. Number of milliseconds to wait for a response.</stringProp>
+          </elementProp>
+          <elementProp name="autoStopErrorRateThreshold" elementType="Argument">
+            <stringProp name="Argument.name">autoStopErrorRateThreshold</stringProp>
+            <stringProp name="Argument.value">${__P(autoStopErrorRateThreshold,5)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Define the Error Rate threshold for the AutoStop Listener. If met then test will fail.</stringProp>
+          </elementProp>
+          <elementProp name="autoStopErrorRateFailureInterval" elementType="Argument">
+            <stringProp name="Argument.name">autoStopErrorRateFailureInterval</stringProp>
+            <stringProp name="Argument.value">${__P(autoStopErrorRateFailureInterval,10)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Define the failure interval when the Error Rate is in acceptable range. If breached, test will fail.</stringProp>
+          </elementProp>
+          <elementProp name="autoStopAvgRespTimeThreshold" elementType="Argument">
+            <stringProp name="Argument.name">autoStopAvgRespTimeThreshold</stringProp>
+            <stringProp name="Argument.value">${__P(autoStopAvgRespTimeThreshold,5000)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Define the Avg. Response time threshold for the AutoStop Listener. If met then test will fail.</stringProp>
+          </elementProp>
+          <elementProp name="autoStopAvgRespTimeFailureInterval" elementType="Argument">
+            <stringProp name="Argument.name">autoStopAvgRespTimeFailureInterval</stringProp>
+            <stringProp name="Argument.value">${__P(autoStopAvgRespTimeFailureInterval,10)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Define the failure interval when the avg. resp. time is in acceptable range. If breached, test will fail.</stringProp>
+          </elementProp>
+          <elementProp name="autoStopAvgLatencyTimeThreshold" elementType="Argument">
+            <stringProp name="Argument.name">autoStopAvgLatencyTimeThreshold</stringProp>
+            <stringProp name="Argument.value">${__P(autoStopAvgLatencyTimeThreshold,5000)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Define the Avg. Latency time threshold for the AutoStop Listener. If met then test will fail.</stringProp>
+          </elementProp>
+          <elementProp name="autoStopAvgLatencyTimeFailureInterval" elementType="Argument">
+            <stringProp name="Argument.name">autoStopAvgLatencyTimeFailureInterval</stringProp>
+            <stringProp name="Argument.value">${__P(autoStopAvgLatencyTimeFailureInterval,10)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Define the failure interval when the avg. latence time is in acceptable range. If breached, test will fail.</stringProp>
+          </elementProp>
+        </collectionProp>
+        <stringProp name="TestPlan.comments">/**
+*
+* Setup step that will try to load config variables provided as:
+* an explicit JMeter property i.e.: -Jthreads=10 
+* or 
+* loaded from an additional JMeter property file, ie: -q name_of_the_property_file.properties
+* If variable values are not provided the default values are used
+*
+**/</stringProp>
+      </Arguments>
+      <hashTree/>
+      <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group" enabled="true">
+        <collectionProp name="ultimatethreadgroupdata">
+          <collectionProp name="1215385281">
+            <stringProp name="1358590835">${__jexl(i=((${RPS}/${noOfLG})*4); i.intValue();)}</stringProp>
+            <stringProp name="-536929293">${startup_delay}</stringProp>
+            <stringProp name="1146764959">${RPS}</stringProp>
+            <stringProp name="-289938830">${duration}</stringProp>
+            <stringProp name="-1606215490">${shutdown_time}</stringProp>
+          </collectionProp>
+        </collectionProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TestPlan.comments">/**
+*
+* We&apos;re using UTG to gain more control over the generated traffic.
+* Unfortunately because JMeter evaluates variables on runtime, you can&apos;t see the threads schedule graph in GUI mode.
+*
+* Number of threads - depends on the number of load generators and desired RPS. We have to calculate amount the user witha a cosntanct click rate equal to 4 clicks per second.
+* ie. : 250 RPS = 1000 Users clicking once every 4 seconds distributed on the number of load generators.
+* 
+* Ramp up time - is related to the RPS, because we need to prepare all the users for the full load
+*
+**/</stringProp>
+      </kg.apc.jmeter.threads.UltimateThreadGroup>
+      <hashTree>
+        <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer" enabled="true">
+          <stringProp name="TestPlan.comments">/**
+*
+* Every user clicks once every 4 seconds
+*
+**/</stringProp>
+          <doubleProp>
+            <name>throughput</name>
+            <value>15.0</value>
+            <savedValue>0.0</savedValue>
+          </doubleProp>
+          <intProp name="calcMode">0</intProp>
+        </ConstantThroughputTimer>
+        <hashTree/>
+        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Randomly select N lines from the Datafile - per thread" enabled="true">
+          <stringProp name="TestPlan.comments">/**
+*
+* This &quot;Only once Controller&quot; contains a script that will randomly select N lines from the Datafile and save them in a thread specific file ie. data/randomized-datafile-thread-${__threadNum}.txt
+* 
+**/</stringProp>
+        </OnceOnlyController>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Randomly select N lines from the Datafile - per thread" enabled="true">
+            <stringProp name="scriptLanguage">java</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey"></stringProp>
+            <stringProp name="script">import org.apache.jmeter.services.FileServer;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import org.apache.log.Logger;
+import java.io.FileReader;
+
+/**
+ *
+ * Author: Janusz Kowalczyk
+ * Created: 2013-09-03
+ * Updated: 2013-09-03
+ * Description:
+ * This script will select N random lines from an input file and save them to an output file.
+ *
+ **/
+public class RandomLinesFromFile {
+    public static final String[] NO_STRINGS = {};
+    final Random random = new Random();
+    private String[] words;
+    private String inputFilename;
+    private File outputFile;
+    // java 6 compatible
+    // System.getProperty(&quot;line.separator&quot;).getBytes();
+    // java 7
+    // System.lineSeparator().getBytes();
+    private  static final byte[] NEWLINE = System.getProperty(&quot;line.separator&quot;).getBytes();
+    int noOfLines;
+    int maxLineLength;
+    Logger log;
+    private FileChannel rwChannel;
+    private ByteBuffer wrBuf;
+
+
+    /**
+     * Default constructor
+     * @param log               org.apache.log.Logger provided by JMeter JSR223 sampler
+     * @param inputFilename     String Absolute path to the input file
+     * @param outputFilename    String Absolute path to the output file
+     * @param noOfLines         int number of lines you want to have in output file
+     * @param maxLineLength     int length of the longest line in the input file. It is used to allocate the buffer size.
+     *                          If unknown then use an estimated value.
+     * @throws IOException
+     */
+    public RandomLinesFromFile(Logger log, String inputFilename, String outputFilename, int noOfLines, int maxLineLength) throws IOException {
+        this.log = log;
+        this.inputFilename = inputFilename;
+        this.outputFile = new File(outputFilename);
+        this.noOfLines = noOfLines;
+        this.maxLineLength = maxLineLength * 8;
+    }
+
+    /**
+     * Will set maxLineLength to 100 characters.
+     * @param log               org.apache.log.Logger provided by JMeter JSR223 sampler
+     * @param inputFilename     String Absolute path to the input file
+     * @param outputFilename    String Absolute path to the output file
+     * @param noOfLines         int number of lines you want to have in output file
+     *
+     * @throws IOException
+     */
+    public RandomLinesFromFile(Logger log, String inputFilename, String outputFilename, int noOfLines) throws IOException {
+        this(log, inputFilename, outputFilename, noOfLines, 100);
+    }
+
+    public void process() throws IOException {
+
+        if(false == new File(this.inputFilename).exists()){
+            log.error(&quot;Input file: &quot; +this.inputFilename + &quot; doesn&apos;t exists!&quot;);
+            throw new IOException(&quot;Input file &apos;&quot;+this.inputFilename +&quot;&apos; doesn&apos;t exists!!!&quot;);
+        }
+
+        if(this.outputFile.exists()){
+            outputFile.delete();
+            log.info(&quot;Output file: &quot; + outputFile.getName() + &quot; was deleted!&quot;);
+        }
+
+        this.rwChannel = new RandomAccessFile(this.outputFile.getAbsolutePath(), &quot;rw&quot;).getChannel();
+        this.wrBuf = ByteBuffer.allocate(noOfLines * maxLineLength);
+
+        this.countLines();
+
+        long start = System.nanoTime();
+        this.words = RandomLinesFromFile.load(inputFilename);
+        long end = System.nanoTime() - start;
+        this.log.info(&quot;It took &quot; + Double.toString(end / 1e9) +&quot; seconds to load the input data file.&quot;);
+
+        this.fillBuffer();
+
+        this.rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, wrBuf.position());
+
+        this.wrBuf.flip();
+
+        this.saveOutput();
+    }
+
+    /**
+     * Will load all line from the input file.
+     * Due to a fact that JSR223 sampler doesn&apos;t support Generics, I&apos;ve replaced them with an Arraylist
+     *
+     * @param filename  String absolute path to the input file
+     * @return An array of string containing all the lines from the input file
+     * @throws IOException
+     */
+    public static String[] load(String filename) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        ArrayList lines = new ArrayList();
+        // JSR223 sampler doesn&apos;t support Generics, so I&apos;ve replaced it with Arraylist
+        // Set&lt;String&gt; lines = new LinkedHashSet&lt;String&gt;();
+        try {
+            for (String line; (line = br.readLine()) != null; ) {
+                // uncomment next line if you want to skip lines with a certain character
+                //if (line.indexOf(&apos;\&apos;&apos;) &gt;= 0) continue;
+                lines.add(line.toLowerCase());
+            }
+        } finally {
+            br.close();
+        }
+        return  (String[]) lines.toArray(NO_STRINGS);
+    }
+
+    /**
+     * Gets next random line from the list of all loaded lines.
+     * @return  String random line from the list of all loaded lines.
+     */
+    public String nextWord() {
+        return this.words[random.nextInt(words.length)];
+    }
+
+    /**
+     * Helper that counts all the lines in the input file
+     * @return int Number of lines in the input file
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    public int countLines() throws IOException, FileNotFoundException {
+        BufferedReader reader = null;
+        int lines = 0;
+        long start = System.nanoTime();
+        try {
+            reader = new BufferedReader(new FileReader(this.inputFilename));
+            while (reader.readLine() != null) {
+                lines++;
+            }
+        } finally {
+            reader.close();
+        }
+        long time = System.nanoTime() - start;
+        log.info(&quot;It took &quot;+ Double.toString(time / 1e9) +&quot; seconds to count &quot; + lines.toString() + &quot; lines in the input data file.&quot;);
+        return lines;
+    }
+
+    /**
+     * Fills up the ByteBuffer with a given number of randomly selected lines
+     */
+    public void fillBuffer(){
+        long start = System.nanoTime();
+        for (int i = 0; i &lt; this.noOfLines; i++) {
+            if (this.wrBuf.hasRemaining()){
+                this.wrBuf.put(this.nextWord().getBytes());
+                this.wrBuf.put(this.NEWLINE);
+            }
+        }
+        long time = System.nanoTime() - start;
+        log.info(&quot;It took &quot;+ Double.toString(time / 1e9) +&quot; seconds to fill up the buffer with &quot;+ this.noOfLines.toString() +&quot; lines.&quot;);
+    }
+
+    /**
+     * Saves the results to an output file
+     * @throws IOException
+     */
+    public void saveOutput() throws IOException {
+        long start = System.nanoTime();
+        try {
+            this.rwChannel.write(this.wrBuf);
+        } finally {
+
+            if (this.rwChannel != null)
+                this.rwChannel.close();
+
+            this.wrBuf.rewind();
+        }
+        long time = System.nanoTime() - start;
+        log.info(&quot;It took &quot;+ Double.toString(time / 1e9) +&quot;seconds to save the output file.&quot;);
+    }
+
+}
+
+
+
+/*
+* We&apos;re using FileServer.getFileServer().getBaseDir() to get an absolute path to the directory that holds the project file (*.jmx)
+* and then access file in the &quot;data&quot; subfolder.
+*/
+String sep = System.getProperty(&quot;file.separator&quot;);
+String bDir = FileServer.getFileServer().getBaseDir();
+String input_file = bDir + sep + vars.get(&quot;datafilepath&quot;);
+String output_file = bDir + sep + &quot;data&quot; + sep + &quot;randomized-datafile-thread-&quot; + (ctx.getThread().getThreadNum()+1).toString() + &quot;.txt&quot;;
+int noOfLines = Integer.parseInt(vars.get(&quot;numberOfRandomLinesToSelect&quot;));
+int maxLineLength = Integer.parseInt(vars.get(&quot;maxLineLength&quot;));
+
+RandomLinesFromFile r = new RandomLinesFromFile(
+        log,
+        input_file,
+        output_file,
+        noOfLines,
+        maxLineLength
+);
+r.process();</stringProp>
+            <stringProp name="TestPlan.comments">/**
+*
+* This script will randomly select N lines from the Datafile and save them in a thread specific file ie. data/randomized-datafile-thread-${__threadNum}.txt
+* 
+**/</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <TestAction guiclass="TestActionGui" testclass="TestAction" testname="Test Action" enabled="true">
+            <stringProp name="TestPlan.comments">/**
+*
+* This test action helps to preserve the execution order.
+* 
+**/</stringProp>
+            <intProp name="ActionProcessor.action">1</intProp>
+            <intProp name="ActionProcessor.target">0</intProp>
+            <stringProp name="ActionProcessor.duration">1</stringProp>
+          </TestAction>
+          <hashTree/>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Load the datafile and make the GET request" enabled="true">
+          <stringProp name="TestPlan.comments">/**
+*
+* This &quot;Simple Controller&quot; will load the datafile and make the GET request.
+* We have to put these elements in a separate controller to preserve the execution order: 
+*	- 1st step - prepare datafiles
+*	- 2nd step -  load the datafile and make the GET request
+* 
+**/</stringProp>
+        </GenericController>
+        <hashTree>
+          <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="load data from randomized datafile" enabled="true">
+            <stringProp name="TestPlan.comments">/**
+*
+* load the datafile
+* 
+**/</stringProp>
+            <stringProp name="filename">data/randomized-datafile-thread-${__threadNum}.txt</stringProp>
+            <stringProp name="fileEncoding">us-ascii</stringProp>
+            <stringProp name="variableNames">CONTEXT,</stringProp>
+            <stringProp name="delimiter">,</stringProp>
+            <boolProp name="quotedData">true</boolProp>
+            <boolProp name="recycle">true</boolProp>
+            <boolProp name="stopThread">false</boolProp>
+            <stringProp name="shareMode">shareMode.thread</stringProp>
+          </CSVDataSet>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${hostname}</stringProp>
+            <stringProp name="HTTPSampler.port">${port}</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout">${connect_timeout}</stringProp>
+            <stringProp name="HTTPSampler.response_timeout">${response_timeout}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${protocol}</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${CONTEXT}</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="TestPlan.comments">/**
+*
+* make the GET request using ${CONTEXT} provide by the previous &quot;CSV Data Set Config&quot; element
+* 
+**/</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="is200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+              <stringProp name="TestPlan.comments">/**
+*
+* Assert that response code is 200 OK
+*
+**/</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="containsAnError" enabled="false">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1389659968">(?is)error</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">6</intProp>
+              <stringProp name="TestPlan.comments">/**
+*
+* Assert that response doesn&apos;t contain any &quot;error&quot; words
+*
+**/</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <kg.apc.jmeter.reporters.AutoStop guiclass="kg.apc.jmeter.reporters.AutoStopGui" testclass="kg.apc.jmeter.reporters.AutoStop" testname="jp@gc - AutoStop Listener" enabled="false">
+        <stringProp name="avg_response_time">${autoStopAvgRespTimeThreshold}</stringProp>
+        <stringProp name="avg_response_time_length">${autoStopAvgRespTimeFailureInterval}</stringProp>
+        <stringProp name="error_rate">${autoStopErrorRateThreshold}</stringProp>
+        <stringProp name="error_rate_length">${autoStopErrorRateFailureInterval}</stringProp>
+        <stringProp name="avg_response_latency">${autoStopAvgLatencyTimeThreshold}</stringProp>
+        <stringProp name="avg_response_latency_length">${autoStopAvgLatencyTimeFailureInterval}</stringProp>
+        <stringProp name="TestPlan.comments">/**
+* 
+* Will automatically stop the test if we hit define error threshold
+*
+**/</stringProp>
+      </kg.apc.jmeter.reporters.AutoStop>
+      <hashTree/>
+      <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="jp@gc - PerfMon Metrics Collector - local" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <hostname>true</hostname>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+          </value>
+        </objProp>
+        <stringProp name="filename">~/PerfMon-local.jtl</stringProp>
+        <longProp name="interval_grouping">1000</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+        <collectionProp name="metricConnections">
+          <collectionProp name="917712290">
+            <stringProp name="-1204607085">localhost</stringProp>
+            <stringProp name="1600768">4444</stringProp>
+            <stringProp name="66952">CPU</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="-211147206">
+            <stringProp name="-1204607085">localhost</stringProp>
+            <stringProp name="1600768">4444</stringProp>
+            <stringProp name="-1993889503">Memory</stringProp>
+            <stringProp name="-790024919">unit=mb:used</stringProp>
+          </collectionProp>
+          <collectionProp name="448386085">
+            <stringProp name="-1204607085">localhost</stringProp>
+            <stringProp name="1600768">4444</stringProp>
+            <stringProp name="2590131">Swap</stringProp>
+            <stringProp name="-790024919">unit=mb:used</stringProp>
+          </collectionProp>
+          <collectionProp name="461024727">
+            <stringProp name="-1204607085">localhost</stringProp>
+            <stringProp name="1600768">4444</stringProp>
+            <stringProp name="-274342153">Network I/O</stringProp>
+            <stringProp name="-380773927">unit=kb:bytessent</stringProp>
+          </collectionProp>
+          <collectionProp name="1281866940">
+            <stringProp name="-1204607085">localhost</stringProp>
+            <stringProp name="1600768">4444</stringProp>
+            <stringProp name="-274342153">Network I/O</stringProp>
+            <stringProp name="-380804057">unit=kb:bytesrecv</stringProp>
+          </collectionProp>
+        </collectionProp>
+        <stringProp name="TestPlan.comments">/**
+*
+* This listener will collect performance data from the JMeter node whilst it is generating load.
+*
+**/</stringProp>
+      </kg.apc.jmeter.perfmon.PerfMonCollector>
+      <hashTree/>
+      <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.LatenciesOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Generate results for all the CMD reporters" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>false</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <hostname>true</hostname>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+          </value>
+        </objProp>
+        <stringProp name="filename">~/result.jtl</stringProp>
+        <longProp name="interval_grouping">500</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+        <stringProp name="TestPlan.comments">/**
+* 
+* All the result files generated by various JMeterPlugins report listeners are generating the same files (result files are identiacl after running sort -u)
+*
+**/</stringProp>
+      </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
+      <hashTree/>
+      <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ResponseCodesPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Save Errors CSV" enabled="false">
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>false</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>false</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>false</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="TestPlan.comments">/**
+* 
+* Store errors in separate CSV file for later analysis
+*
+**/</stringProp>
+        <stringProp name="filename">~/errors_csv.jtl</stringProp>
+        <longProp name="interval_grouping">1000</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+      </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
+      <hashTree/>
+      <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ResponseCodesPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Save Errors XML" enabled="false">
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>false</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>false</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>false</subresults>
+            <responseData>true</responseData>
+            <samplerData>true</samplerData>
+            <xml>true</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>true</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="TestPlan.comments">/**
+* 
+* Store errors in separate XML file for later analysis
+*
+* Compared to CSV error file this listener will also save send POST data!
+**/</stringProp>
+        <stringProp name="filename">~/errors_xml.jtl</stringProp>
+        <longProp name="interval_grouping">1000</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+      </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
+      <hashTree/>
+      <Summariser guiclass="SummariserGui" testclass="Summariser" testname="Generate Summary Results" enabled="false">
+        <stringProp name="TestPlan.comments">/**
+*
+* Required to display execution progress in console log
+*
+**/</stringProp>
+      </Summariser>
+      <hashTree/>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
